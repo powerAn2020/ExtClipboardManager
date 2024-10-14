@@ -8,6 +8,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.annotation.RequiresApi
 import com.hhvvg.ecm.BuildConfig
 import com.hhvvg.ecm.ExtFramework.Companion.clipboardImplName
 import com.hhvvg.ecm.IExtClipboardService
@@ -72,35 +73,78 @@ class ExtendedClipboardService(
         provideAutoClearService()
     }
 
+    //    从13开始剪切板实现类入参改了
+// https://android.googlesource.com/platform/frameworks/base.git/+/refs/tags/android-platform-13.0.0_r24/services/core/java/com/android/server/clipboard/ClipboardService.java
     private fun provideBinderService() {
-        clipboardImplName
-            .asClass(context.classLoader)
-            ?.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
+        val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return;
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
+            clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
                 val packageName = it.args[0].toString()
                 if (packageName == BuildConfig.PACKAGE_NAME) {
                     onServiceRequirement(it)
                 }
             }
+        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
+            clipImplClazz.doAfter(
+                "getPrimaryClip",
+                String::class.java,
+                String::class.java,
+                Int::class.java
+            ) {
+                val packageName = it.args[0].toString()
+                if (packageName == BuildConfig.PACKAGE_NAME) {
+                    onServiceRequirement(it)
+                }
+            }
+        }
     }
 
     private fun provideAutoClearService() {
         val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return
-        clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
-            val packageName = it.args[0] as String
-            val userId = it.args[1] as Int
-            val clipData = it.result as ClipData?
-            onPrimaryClipGet(clipData, packageName, userId)
-        }
-        clipImplClazz.doAfter(
-            "setPrimaryClip",
-            ClipData::class.java,
-            String::class.java,
-            Int::class.java
-        ) {
-            val data = it.args[0] as ClipData
-            val packageName = it.args[1] as String
-            val uid = it.args[2] as Int
-            onClipboardSet(data, packageName, uid)
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
+
+            clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
+                val packageName = it.args[0] as String
+                val userId = it.args[1] as Int
+                val clipData = it.result as ClipData?
+                onPrimaryClipGet(clipData, packageName, userId)
+            }
+            clipImplClazz.doAfter(
+                "setPrimaryClip",
+                ClipData::class.java,
+                String::class.java,
+                Int::class.java
+            ) {
+                val data = it.args[0] as ClipData
+                val packageName = it.args[1] as String
+                val uid = it.args[2] as Int
+                onClipboardSet(data, packageName, uid)
+            }
+        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
+            clipImplClazz.doAfter(
+                "getPrimaryClip",
+                String::class.java,
+                String::class.java,
+                Int::class.java
+            ) {
+
+                val packageName = it.args[0] as String
+                val userId = it.args[2] as Int
+                val clipData = it.result as ClipData?
+                onPrimaryClipGet(clipData, packageName, userId)
+            }
+            clipImplClazz.doAfter(
+                "setPrimaryClip",
+                ClipData::class.java,
+                String::class.java,
+                String::class.java,
+                Int::class.java,
+            ) {
+                val data = it.args[0] as ClipData
+                val packageName = it.args[1] as String
+                val uid = it.args[3] as Int
+                onClipboardSet(data, packageName, uid)
+            }
         }
     }
 
@@ -321,6 +365,7 @@ class ExtendedClipboardService(
         dataStore.addAutoClearStrategy(strategy)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun removeStrategy(packageName: String) {
         dataStore.removeAutoClearStrategy(packageName)
     }
