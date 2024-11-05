@@ -26,7 +26,7 @@ class WriteStrategyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(WriteStrategyViewModel::class.java)
+        viewModel = ViewModelProvider(this)[WriteStrategyViewModel::class.java]
     }
 
 }

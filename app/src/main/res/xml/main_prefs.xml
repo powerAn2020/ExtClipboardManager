@@ -28,7 +28,7 @@
             android:title="@string/auto_clear_strategy"/>
     </PreferenceCategory>
 
-    <!-- PreferenceCategory
+    <PreferenceCategory
         android:title="@string/category_filter_summary">
         <com.hhvvg.ecm.ui.view.ExtSwitchPreference
             app:icon="@drawable/ic_baseline_text_24"
@@ -48,7 +48,7 @@
             android:key="filter_app_write_strategy"
             android:dependency="filter_app_write"
             android:title="@string/write_strategy_title" />
-    </PreferenceCategory -->
+    </PreferenceCategory >
 
     <PreferenceCategory
         android:title="@string/about_title">
@@ -57,14 +57,14 @@
             android:summary="@string/source_code_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/gitofleonardo/ExtClipboardManager"/>
+                android:data="https://github.com/powerAn2020/ExtClipboardManager"/>
         </Preference>
         <Preference
             android:title="@string/feedback_title"
             android:summary="@string/feedback_desc">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/gitofleonardo/ExtClipboardManager/issues"/>
+                android:data="https://github.com/powerAn2020/ExtClipboardManager/issues"/>
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

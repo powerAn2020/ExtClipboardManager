@@ -42,10 +42,10 @@
             android:value="Extended ClipboardManager" />
         <meta-data
             android:name="xposedminversion"
-            android:value="53" />
+            android:value="89" />
         <meta-data
             android:name="xposedscope"
-            android:value="@array/xposed_scope" />
+            android:value="android" />
 
         <activity
             android:name=".ui.MainActivity"

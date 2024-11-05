@@ -36,8 +36,8 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     private lateinit var autoClearSwitchPreference: ExtSwitchPreference
     private lateinit var timeoutClearSwitchPref: ExtSwitchPreference
     private lateinit var autoClearStrategyPreference: Preference
-//    private lateinit var readStrategyPreference: Preference
-//    private lateinit var writeStrategyPreference: Preference
+    private lateinit var readStrategyPreference: Preference
+    private lateinit var writeStrategyPreference: Preference
     private val extService by lazy {
         requireContext().getSystemExtClipboardService()
     }
@@ -69,8 +69,8 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_prefs, rootKey)
         setupEnablePref()
-//        setupReadStrategyPref()
-//        setupWriteStrategyPref()
+        setupReadStrategyPref()
+        setupWriteStrategyPref()
         setupAutoClearPref()
         setupAutoClearStrategyPref()
         setupTimeoutClearPref()
@@ -142,23 +142,23 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
         autoClearSwitchPreference.dependency = "enable_management"
     }
 
-//    private fun setupReadStrategyPref() {
-//        readStrategyPreference = findPreference("filter_app_read_strategy")!!
-//        readStrategyPreference.setOnPreferenceClickListener {
-//            val action = MainFragmentDirections.actionMainFragmentToReadStrategyFragment()
-//            navController.navigate(action)
-//            true
-//        }
-//    }
-//
-//    private fun setupWriteStrategyPref() {
-//        writeStrategyPreference = findPreference("filter_app_write_strategy")!!
-//        writeStrategyPreference.setOnPreferenceClickListener {
-//            val action = MainFragmentDirections.actionMainFragmentToWriteStrategyFragment()
-//            navController.navigate(action)
-//            true
-//        }
-//    }
+    private fun setupReadStrategyPref() {
+        readStrategyPreference = findPreference("filter_app_read_strategy")!!
+        readStrategyPreference.setOnPreferenceClickListener {
+            val action = MainFragmentDirections.actionMainFragmentToReadStrategyFragment()
+            navController.navigate(action)
+            true
+        }
+    }
+
+    private fun setupWriteStrategyPref() {
+        writeStrategyPreference = findPreference("filter_app_write_strategy")!!
+        writeStrategyPreference.setOnPreferenceClickListener {
+            val action = MainFragmentDirections.actionMainFragmentToWriteStrategyFragment()
+            navController.navigate(action)
+            true
+        }
+    }
 
     private fun setupEnablePref() {
         enableSwitchPreference = findPreference("enable_management")!!
@@ -197,7 +197,7 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
             R.id.share -> {
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "https://github.com/gitofleonardo/ExtClipboardManager")
+                    putExtra(Intent.EXTRA_TEXT, "https://github.com/powerAn2020/ExtClipboardManager")
                     type = "text/plain"
                 }
                 val shareIntent = Intent.createChooser(sendIntent, null)

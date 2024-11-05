@@ -8,6 +8,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.hhvvg.ecm.BuildConfig
 import com.hhvvg.ecm.ExtFramework.Companion.clipboardImplName
@@ -76,7 +77,7 @@ class ExtendedClipboardService(
     //    从13开始剪切板实现类入参改了
 // https://android.googlesource.com/platform/frameworks/base.git/+/refs/tags/android-platform-13.0.0_r24/services/core/java/com/android/server/clipboard/ClipboardService.java
     private fun provideBinderService() {
-        val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return;
+        val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
             clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
                 val packageName = it.args[0].toString()
@@ -304,13 +305,21 @@ class ExtendedClipboardService(
     }
 
     override fun setEnable(enable: Boolean) {
-        dataStore.enable = enable
+        if (checkCallingOrSelfPermission()){
+            dataStore.enable = enable
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun isEnable(): Boolean = dataStore.enable
 
     override fun setAutoClearEnable(enable: Boolean) {
-        dataStore.autoClearEnable = enable
+        if (checkCallingOrSelfPermission()) {
+            dataStore.autoClearEnable = enable
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun isAutoClearEnable(): Boolean = dataStore.autoClearEnable
@@ -318,22 +327,38 @@ class ExtendedClipboardService(
     override fun getAutoClearWorkMode(): Int = dataStore.autoClearWorkMode
 
     override fun setAutoClearWorkMode(mode: Int) {
-        dataStore.autoClearWorkMode = mode
+        if (checkCallingOrSelfPermission()) {
+            dataStore.autoClearWorkMode = mode
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun getAutoClearReadCount(): Int = dataStore.autoClearReadCount
 
     override fun setAutoClearReadCount(count: Int) {
-        dataStore.autoClearReadCount = count
-        resetReadCount()
+        if (checkCallingOrSelfPermission()){
+            dataStore.autoClearReadCount = count
+            resetReadCount()
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun setAutoClearAppWhitelist(exclusions: MutableList<String>) {
-        dataStore.autoClearAppWhitelist = exclusions
+        if (checkCallingOrSelfPermission()){
+            dataStore.autoClearAppWhitelist = exclusions
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun setAutoClearAppBlacklist(exclusions: MutableList<String>) {
-        dataStore.autoClearAppBlacklist = exclusions
+        if (checkCallingOrSelfPermission()){
+            dataStore.autoClearAppBlacklist = exclusions
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun getAutoClearAppBlacklist(): List<String> = dataStore.autoClearAppBlacklist
@@ -341,7 +366,11 @@ class ExtendedClipboardService(
     override fun getAutoClearAppWhitelist(): List<String> = dataStore.autoClearAppWhitelist
 
     override fun setAutoClearContentExclusionList(exclusions: List<String>) {
-        dataStore.autoClearContentExclusionList = exclusions
+        if (checkCallingOrSelfPermission()){
+            dataStore.autoClearContentExclusionList = exclusions
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun getAutoClearContentExclusionList(): List<String> = dataStore.autoClearContentExclusionList
@@ -351,8 +380,12 @@ class ExtendedClipboardService(
     }
 
     override fun setAutoClearTimeout(timeout: Long) {
-        dataStore.autoClearTimeout = timeout
-        rescheduleCurrentAutoClearTimeoutTask()
+        if (checkCallingOrSelfPermission()){
+            dataStore.autoClearTimeout = timeout
+            rescheduleCurrentAutoClearTimeoutTask()
+        }else{
+            XposedBridge.log("permission denied")
+        }
     }
 
     override fun getAutoClearTimeout(): Long {
@@ -375,6 +408,21 @@ class ExtendedClipboardService(
             val bundle = Bundle()
             bundle.putBinder(bundleBinderKey, binder)
             putExtra(intentBundleKey, bundle)
+        }
+    }
+    //增加包名检测，防止其他应用恶意调用
+    private fun checkCallingOrSelfPermission(): Boolean {
+        val callingPid = Binder.getCallingPid()
+        val callingUid = Binder.getCallingUid()
+        // 通过uid获取包名，需要使用Context的包管理服务
+        val packageManager = context.packageManager
+        val packages = packageManager.getPackagesForUid(callingUid)
+        val callingPackage = if (!packages.isNullOrEmpty()) packages[0] else null
+        Log.d("ExtClipboradManager", "调用者PID: $callingPid, 调用者包名: $callingPackage")
+        return if (callingPackage!=null){
+            callingPackage == BuildConfig.PACKAGE_NAME
+        }else{
+            false
         }
     }
 }
