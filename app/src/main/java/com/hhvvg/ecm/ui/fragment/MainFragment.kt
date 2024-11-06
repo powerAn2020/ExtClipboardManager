@@ -12,12 +12,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ListView
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.hhvvg.ecm.R
+import com.hhvvg.ecm.configuration.Configuration
 import com.hhvvg.ecm.receiver.ServiceStateReceiver
 import com.hhvvg.ecm.ui.view.ExtSwitchPreference
 import com.hhvvg.ecm.util.getSystemExtClipboardService
@@ -145,7 +147,7 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     private fun setupReadStrategyPref() {
         readStrategyPreference = findPreference("filter_app_read_strategy")!!
         readStrategyPreference.setOnPreferenceClickListener {
-            val action = MainFragmentDirections.actionMainFragmentToReadStrategyFragment()
+            val action = MainFragmentDirections.actionMainFragmentToReadStrategyFragment(Configuration.READ_MODE)
             navController.navigate(action)
             true
         }
@@ -154,7 +156,7 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     private fun setupWriteStrategyPref() {
         writeStrategyPreference = findPreference("filter_app_write_strategy")!!
         writeStrategyPreference.setOnPreferenceClickListener {
-            val action = MainFragmentDirections.actionMainFragmentToWriteStrategyFragment()
+            val action = MainFragmentDirections.actionMainFragmentToWriteStrategyFragment(Configuration.WRITE_MODE)
             navController.navigate(action)
             true
         }

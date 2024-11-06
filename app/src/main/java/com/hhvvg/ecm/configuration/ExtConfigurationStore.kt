@@ -101,7 +101,20 @@ class ExtConfigurationStore {
             configuration.autoClearContentExclusionList.addAll(value)
             workHandler.post(this::saveConfiguration)
         }
-
+    var appReadWhitelist: List<String>
+        get() = configuration.appReadWhitelist
+        set(value) {
+            configuration.appReadWhitelist.clear()
+            configuration.appReadWhitelist.addAll(value)
+            workHandler.post(this::saveConfiguration)
+        }
+    var appWriteWhitelist: List<String>
+        get() = configuration.appWriteWhitelist
+        set(value) {
+            configuration.appWriteWhitelist.clear()
+            configuration.appWriteWhitelist.addAll(value)
+            workHandler.post(this::saveConfiguration)
+        }
     init {
         configuration = try {
             val json = readFromFile()

@@ -15,14 +15,22 @@
             app:enterAnim="@anim/anim_open_enter"
             app:exitAnim="@anim/anim_open_exit"
             app:popEnterAnim="@anim/anim_close_enter"
-            app:popExitAnim="@anim/anim_close_exit"/>
+            app:popExitAnim="@anim/anim_close_exit">
+            <argument
+                android:name="selectedStrategy"
+                app:argType="string" />
+        </action>
         <action
             android:id="@+id/action_mainFragment_to_writeStrategyFragment"
             app:destination="@id/writeStrategyFragment"
             app:enterAnim="@anim/anim_open_enter"
             app:exitAnim="@anim/anim_open_exit"
             app:popEnterAnim="@anim/anim_close_enter"
-            app:popExitAnim="@anim/anim_close_exit"/>
+            app:popExitAnim="@anim/anim_close_exit">
+            <argument
+                android:name="selectedStrategy"
+                app:argType="string" />
+        </action>
         <action
             android:id="@+id/action_mainFragment_to_autoClearStrategyFragment"
             app:destination="@id/autoClearStrategyFragment"
@@ -34,15 +42,23 @@
 
     <fragment
         android:id="@+id/readStrategyFragment"
-        android:name="com.hhvvg.ecm.ui.fragment.ReadStrategyFragment"
+        android:name="com.hhvvg.ecm.ui.fragment.AccessStrategyFragment"
         android:label="@string/read_strategy_title"
-        tools:layout="@layout/fragment_read_strategy"/>
+        tools:layout="@layout/auto_work_mode_item_layout">
+        <argument
+            android:name="selectedStrategy"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/writeStrategyFragment"
-        android:name="com.hhvvg.ecm.ui.fragment.WriteStrategyFragment"
+        android:name="com.hhvvg.ecm.ui.fragment.AccessStrategyFragment"
         android:label="@string/write_strategy_title"
-        tools:layout="@layout/fragment_write_strategy"/>
+        tools:layout="@layout/auto_work_mode_item_layout">
+<!--        <argument-->
+<!--            android:name="selectedStrategy"-->
+<!--            app:argType="string" />-->
+    </fragment>
 
     <fragment
         android:id="@+id/autoClearStrategyFragment"

@@ -398,10 +398,31 @@ class ExtendedClipboardService(
         dataStore.addAutoClearStrategy(strategy)
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun removeStrategy(packageName: String) {
         dataStore.removeAutoClearStrategy(packageName)
     }
+
+    override fun setAppReadWhitelist(exclusions: List<String>) {
+        if (checkCallingOrSelfPermission()){
+            dataStore.appReadWhitelist = exclusions
+            rescheduleCurrentAutoClearTimeoutTask()
+        }else{
+            XposedBridge.log("permission denied")
+        }
+    }
+
+    override fun setAppWriteWhitelist(exclusions: List<String>) {
+        if (checkCallingOrSelfPermission()){
+            dataStore.appWriteWhitelist = exclusions
+            rescheduleCurrentAutoClearTimeoutTask()
+        }else{
+            XposedBridge.log("permission denied")
+        }
+    }
+
+    override fun getAppReadWhitelist(): List<String> = dataStore.appReadWhitelist
+
+    override fun getAppWriteWhitelist(): List<String> = dataStore.appWriteWhitelist
 
     private fun createBinderIntent(binder: IBinder): Intent {
         return Intent().apply {

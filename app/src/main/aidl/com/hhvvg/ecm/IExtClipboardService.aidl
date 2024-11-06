@@ -27,4 +27,9 @@ interface IExtClipboardService {
     List<AutoClearStrategyInfo> getAutoClearStrategies();
     void addAutoClearStrategy(in AutoClearStrategyInfo strategy);
     void removeStrategy(String packageName);
+
+    void setAppReadWhitelist(in List<String> exclusions);
+    void setAppWriteWhitelist(in List<String> exclusions);
+    List<String> getAppReadWhitelist();
+    List<String> getAppWriteWhitelist();
 }

@@ -13,9 +13,13 @@ class Configuration{
     var autoClearAppBlacklist: MutableList<String> = mutableListOf()
     var autoClearAppWhitelist: MutableList<String> = mutableListOf()
     var autoClearContentExclusionList: MutableList<String> = mutableListOf()
+    var appReadWhitelist: MutableList<String> = mutableListOf()
+    var appWriteWhitelist: MutableList<String> = mutableListOf()
 
     companion object {
         const val WORK_MODE_WHITELIST = 0
         const val WORK_MODE_BLACKLIST = 1
+        const val READ_MODE = "READ"
+        const val WRITE_MODE = "WRITE"
     }
 }
