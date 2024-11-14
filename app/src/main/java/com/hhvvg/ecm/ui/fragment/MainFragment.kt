@@ -40,6 +40,8 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     private lateinit var autoClearStrategyPreference: Preference
     private lateinit var readStrategyPreference: Preference
     private lateinit var writeStrategyPreference: Preference
+    private lateinit var readSwitchPreference: Preference
+    private lateinit var writeSwitchPreference: Preference
     private val extService by lazy {
         requireContext().getSystemExtClipboardService()
     }
@@ -145,6 +147,8 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     }
 
     private fun setupReadStrategyPref() {
+        readSwitchPreference = findPreference("filter_app_read")!!
+        readSwitchPreference.dependency = "enable_management"
         readStrategyPreference = findPreference("filter_app_read_strategy")!!
         readStrategyPreference.setOnPreferenceClickListener {
             val action = MainFragmentDirections.actionMainFragmentToReadStrategyFragment(Configuration.READ_MODE)
@@ -154,6 +158,8 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     }
 
     private fun setupWriteStrategyPref() {
+        writeSwitchPreference = findPreference("filter_app_write")!!
+        writeSwitchPreference.dependency = "enable_management"
         writeStrategyPreference = findPreference("filter_app_write_strategy")!!
         writeStrategyPreference.setOnPreferenceClickListener {
             val action = MainFragmentDirections.actionMainFragmentToWriteStrategyFragment(Configuration.WRITE_MODE)

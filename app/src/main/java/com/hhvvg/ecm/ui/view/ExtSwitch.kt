@@ -201,15 +201,15 @@ class ExtSwitch : View, Checkable, ValueAnimator.AnimatorUpdateListener, View.On
             interpolator = AccelerateDecelerateInterpolator()
             addUpdateListener(this@ExtSwitch)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     state = STATE_ANIMATING_OPEN
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     state = STATE_OPEN
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     state = STATE_CLOSE
                 }
             })
@@ -224,15 +224,15 @@ class ExtSwitch : View, Checkable, ValueAnimator.AnimatorUpdateListener, View.On
             interpolator = AccelerateDecelerateInterpolator()
             addUpdateListener(this@ExtSwitch)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     state = STATE_ANIMATING_CLOSE
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     state = STATE_CLOSE
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     state = STATE_OPEN
                 }
             })

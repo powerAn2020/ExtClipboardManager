@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.hhvvg.ecm.BuildConfig
 import com.hhvvg.ecm.ExtFramework.Companion.clipboardImplName
 import com.hhvvg.ecm.IExtClipboardService
@@ -72,79 +71,131 @@ class ExtendedClipboardService(
     private fun ensureServices() {
         provideBinderService()
         provideAutoClearService()
+        provideClipboardAccessService()
     }
 
-    //    从13开始剪切板实现类入参改了
-// https://android.googlesource.com/platform/frameworks/base.git/+/refs/tags/android-platform-13.0.0_r24/services/core/java/com/android/server/clipboard/ClipboardService.java
-    private fun provideBinderService() {
+    private fun provideAutoClearService() {
         val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
-            clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
-                val packageName = it.args[0].toString()
-                if (packageName == BuildConfig.PACKAGE_NAME) {
-                    onServiceRequirement(it)
+        when (Build.VERSION.SDK_INT) {
+            Build.VERSION_CODES.S_V2 -> {
+
+                clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
+                    val packageName = it.args[0] as String
+                    val userId = it.args[1] as Int
+                    val clipData = it.result as ClipData?
+                    onPrimaryClipGet(clipData, packageName, userId)
+                }
+                clipImplClazz.doAfter("setPrimaryClip",
+                    ClipData::class.java,
+                    String::class.java,
+                    Int::class.java
+                ) {
+                    val data = it.args[0] as ClipData
+                    val packageName = it.args[1] as String
+                    val uid = it.args[2] as Int
+                    onClipboardSet(data, packageName, uid)
                 }
             }
-        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
-            clipImplClazz.doAfter(
-                "getPrimaryClip",
-                String::class.java,
-                String::class.java,
-                Int::class.java
-            ) {
-                val packageName = it.args[0].toString()
-                if (packageName == BuildConfig.PACKAGE_NAME) {
-                    onServiceRequirement(it)
+            Build.VERSION_CODES.TIRAMISU -> {
+                clipImplClazz.doAfter("getPrimaryClip",
+                    String::class.java,
+                    String::class.java,
+                    Int::class.java,
+                ) {
+
+                    val packageName = it.args[0] as String
+                    val userId = it.args[2] as Int
+                    val clipData = it.result as ClipData?
+                    onPrimaryClipGet(clipData, packageName, userId)
+                }
+                clipImplClazz.doAfter("setPrimaryClip",
+                    ClipData::class.java,
+                    String::class.java,
+                    String::class.java,
+                    Int::class.java,
+                ) {
+                    val data = it.args[0] as ClipData
+                    val packageName = it.args[1] as String
+                    val uid = it.args[3] as Int
+                    onClipboardSet(data, packageName, uid)
+                }
+            }
+            Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                clipImplClazz.doAfter("getPrimaryClip",
+                    String::class.java,
+                    String::class.java,
+                    Int::class.java,
+                    Int::class.java
+                ) {
+                    val packageName = it.args[0] as String
+                    val userId = it.args[2] as Int
+                    val clipData = it.result as ClipData?
+                    onPrimaryClipGet(clipData, packageName, userId)
+                }
+                clipImplClazz.doAfter("setPrimaryClip",
+                    ClipData::class.java,
+                    String::class.java,
+                    String::class.java,
+                    Int::class.java,
+                    Int::class.java
+                ) {
+                    val data = it.args[0] as ClipData
+                    val packageName = it.args[1] as String
+                    val uid = it.args[3] as Int
+                    onClipboardSet(data, packageName, uid)
                 }
             }
         }
     }
 
-    private fun provideAutoClearService() {
+    /**
+     * hook剪切板权限，允许的包可以在后台读取剪切板
+     */
+    private fun provideClipboardAccessService() {
         val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
-
-            clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
-                val packageName = it.args[0] as String
-                val userId = it.args[1] as Int
-                val clipData = it.result as ClipData?
-                onPrimaryClipGet(clipData, packageName, userId)
+        when (Build.VERSION.SDK_INT) {
+            Build.VERSION_CODES.S_V2 -> {
+                clipImplClazz.doAfter("clipboardAccessAllowed",
+                    Int::class.java,// op
+                    String::class.java,// callingPackage
+                    Int::class.java, // uid
+                    Int::class.java, // userId
+                    Boolean::class.java // shouldNoteOp
+                ) {
+                    //通过调用者UID获取包名，然后匹配白名单
+                    if(dataStore.appReadWhitelist.contains(it.args[1])){
+                        it.result=true
+                    }
+                }
             }
-            clipImplClazz.doAfter(
-                "setPrimaryClip",
-                ClipData::class.java,
-                String::class.java,
-                Int::class.java
-            ) {
-                val data = it.args[0] as ClipData
-                val packageName = it.args[1] as String
-                val uid = it.args[2] as Int
-                onClipboardSet(data, packageName, uid)
+            Build.VERSION_CODES.TIRAMISU -> {
+                clipImplClazz.doAfter("clipboardAccessAllowed",
+                    Int::class.java, // op
+                    String::class.java, // callingPackage
+                    String::class.java, // attributionTag
+                    Int::class.java, // uid
+                    Int::class.java, // userId
+                    Boolean::class.java // shouldNoteOp
+                ) {
+                    if(dataStore.appReadWhitelist.contains(it.args[1])){
+                        it.result=true
+                    }
+                }
             }
-        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
-            clipImplClazz.doAfter(
-                "getPrimaryClip",
-                String::class.java,
-                String::class.java,
-                Int::class.java
-            ) {
-
-                val packageName = it.args[0] as String
-                val userId = it.args[2] as Int
-                val clipData = it.result as ClipData?
-                onPrimaryClipGet(clipData, packageName, userId)
-            }
-            clipImplClazz.doAfter(
-                "setPrimaryClip",
-                ClipData::class.java,
-                String::class.java,
-                String::class.java,
-                Int::class.java,
-            ) {
-                val data = it.args[0] as ClipData
-                val packageName = it.args[1] as String
-                val uid = it.args[3] as Int
-                onClipboardSet(data, packageName, uid)
+            Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                clipImplClazz.doAfter("clipboardAccessAllowed",
+                    Int::class.java, // op
+                    String::class.java,// callingPackage
+                    String::class.java, // attributionTag
+                    Int::class.java, // uid
+                    Int::class.java, // userId
+                    Int::class.java, // intendingDeviceId
+                    Boolean::class.java // shouldNoteOp
+                ) {
+                    if(dataStore.appReadWhitelist.contains(it.args[1])){
+                        it.result=true
+                    }
+                }
             }
         }
     }
@@ -211,6 +262,49 @@ class ExtendedClipboardService(
             Configuration.WORK_MODE_BLACKLIST -> {
                 if (matchesBlacklist(packageName)) {
                     countDownAndClearIfPossible(packageName, userId)
+                }
+            }
+        }
+    }
+
+    //    从13开始剪切板实现类入参改了
+// https://android.googlesource.com/platform/frameworks/base.git/+/refs/tags/android-platform-12.1.0_r32/services/core/java/com/android/server/clipboard/ClipboardService.java
+// https://android.googlesource.com/platform/frameworks/base.git/+/refs/tags/android-platform-13.0.0_r24/services/core/java/com/android/server/clipboard/ClipboardService.java
+// https://android.googlesource.com/platform/frameworks/base.git/+/refs/tags/android-platform-14.0.0_r13/services/core/java/com/android/server/clipboard/ClipboardService.java
+    private fun provideBinderService() {
+        val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return
+        when (Build.VERSION.SDK_INT) {
+            Build.VERSION_CODES.S_V2 -> {
+                clipImplClazz.doAfter("getPrimaryClip", String::class.java, Int::class.java) {
+                    val packageName = it.args[0].toString()
+                    if (packageName == BuildConfig.PACKAGE_NAME) {
+                        onServiceRequirement(it)
+                    }
+                }
+            }
+            Build.VERSION_CODES.TIRAMISU -> {
+                clipImplClazz.doAfter("getPrimaryClip",
+                    String::class.java,
+                    String::class.java,
+                    Int::class.java
+                ) {
+                    val packageName = it.args[0].toString()
+                    if (packageName == BuildConfig.PACKAGE_NAME) {
+                        onServiceRequirement(it)
+                    }
+                }
+            }
+            Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                clipImplClazz.doAfter("getPrimaryClip",
+                    String::class.java,
+                    String::class.java,
+                    Int::class.java,
+                    Int::class.java
+                ) {
+                    val packageName = it.args[0].toString()
+                    if (packageName == BuildConfig.PACKAGE_NAME) {
+                        onServiceRequirement(it)
+                    }
                 }
             }
         }
@@ -305,7 +399,7 @@ class ExtendedClipboardService(
     }
 
     override fun setEnable(enable: Boolean) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.enable = enable
         }else{
             XposedBridge.log("permission denied")
@@ -315,7 +409,7 @@ class ExtendedClipboardService(
     override fun isEnable(): Boolean = dataStore.enable
 
     override fun setAutoClearEnable(enable: Boolean) {
-        if (checkCallingOrSelfPermission()) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
             dataStore.autoClearEnable = enable
         }else{
             XposedBridge.log("permission denied")
@@ -327,7 +421,7 @@ class ExtendedClipboardService(
     override fun getAutoClearWorkMode(): Int = dataStore.autoClearWorkMode
 
     override fun setAutoClearWorkMode(mode: Int) {
-        if (checkCallingOrSelfPermission()) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
             dataStore.autoClearWorkMode = mode
         }else{
             XposedBridge.log("permission denied")
@@ -337,7 +431,7 @@ class ExtendedClipboardService(
     override fun getAutoClearReadCount(): Int = dataStore.autoClearReadCount
 
     override fun setAutoClearReadCount(count: Int) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearReadCount = count
             resetReadCount()
         }else{
@@ -346,7 +440,7 @@ class ExtendedClipboardService(
     }
 
     override fun setAutoClearAppWhitelist(exclusions: MutableList<String>) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearAppWhitelist = exclusions
         }else{
             XposedBridge.log("permission denied")
@@ -354,7 +448,7 @@ class ExtendedClipboardService(
     }
 
     override fun setAutoClearAppBlacklist(exclusions: MutableList<String>) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearAppBlacklist = exclusions
         }else{
             XposedBridge.log("permission denied")
@@ -366,7 +460,7 @@ class ExtendedClipboardService(
     override fun getAutoClearAppWhitelist(): List<String> = dataStore.autoClearAppWhitelist
 
     override fun setAutoClearContentExclusionList(exclusions: List<String>) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearContentExclusionList = exclusions
         }else{
             XposedBridge.log("permission denied")
@@ -380,7 +474,7 @@ class ExtendedClipboardService(
     }
 
     override fun setAutoClearTimeout(timeout: Long) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearTimeout = timeout
             rescheduleCurrentAutoClearTimeoutTask()
         }else{
@@ -403,7 +497,7 @@ class ExtendedClipboardService(
     }
 
     override fun setAppReadWhitelist(exclusions: List<String>) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.appReadWhitelist = exclusions
             rescheduleCurrentAutoClearTimeoutTask()
         }else{
@@ -412,7 +506,7 @@ class ExtendedClipboardService(
     }
 
     override fun setAppWriteWhitelist(exclusions: List<String>) {
-        if (checkCallingOrSelfPermission()){
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.appWriteWhitelist = exclusions
             rescheduleCurrentAutoClearTimeoutTask()
         }else{
@@ -432,7 +526,7 @@ class ExtendedClipboardService(
         }
     }
     //增加包名检测，防止其他应用恶意调用
-    private fun checkCallingOrSelfPermission(): Boolean {
+    private fun checkCallingOrSelfPermission(packageName: String): Boolean {
         val callingPid = Binder.getCallingPid()
         val callingUid = Binder.getCallingUid()
         // 通过uid获取包名，需要使用Context的包管理服务
@@ -440,8 +534,8 @@ class ExtendedClipboardService(
         val packages = packageManager.getPackagesForUid(callingUid)
         val callingPackage = if (!packages.isNullOrEmpty()) packages[0] else null
         Log.d("ExtClipboradManager", "调用者PID: $callingPid, 调用者包名: $callingPackage")
-        return if (callingPackage!=null){
-            callingPackage == BuildConfig.PACKAGE_NAME
+        return  if (callingPackage!=null){
+            callingPackage == packageName
         }else{
             false
         }

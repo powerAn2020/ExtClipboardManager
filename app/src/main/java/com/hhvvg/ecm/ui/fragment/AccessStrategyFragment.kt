@@ -63,7 +63,7 @@ class AccessStrategyFragment : BaseAppListFragment<WorkListItem>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         selectedStrategy= arguments?.getString("selectedStrategy").toString()
         super.onCreate(savedInstanceState)
-        selectedStrategy= arguments?.getString("selectedStrategy").toString()
+//        selectedStrategy= arguments?.getString("selectedStrategy").toString()
 
     }
 }

@@ -1,9 +1,11 @@
 package com.hhvvg.ecm.receiver
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 
 abstract class ServiceStateReceiver : BroadcastReceiver() {
 
@@ -31,9 +33,17 @@ abstract class ServiceStateReceiver : BroadcastReceiver() {
             context.sendBroadcast(intent)
         }
 
+        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         fun registerStateChangedReceiver(context: Context, receiver: BroadcastReceiver) {
             val intentFilter = IntentFilter(ACTION_STATE_CHANGED)
-            context.registerReceiver(receiver, intentFilter)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                //在 Android 14 之前，注册广播接收器时不需要指定 RECEIVER_EXPORTED 或 RECEIVER_NOT_EXPORTED
+                // 这两个标志。但是从 Android 14 开始，系统对广播接收器的注册有了更严格的安全要求
+                context.registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED)
+            }else{
+                context.registerReceiver(receiver, intentFilter)
+            }
+
         }
 
     }
