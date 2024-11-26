@@ -53,7 +53,7 @@ class BaseAppListViewModel : ViewModel() {
             } else {
                 it.flags and ApplicationInfo.FLAG_SYSTEM == 0
             }
-            val filterNamePassed = filterText.isEmpty() || it.appName.contains(filterText) || it.packageName.contains(filterText)
+            val filterNamePassed = filterText.isEmpty() || it.appName.contains(filterText,ignoreCase = true) || it.packageName.contains(filterText,ignoreCase = true)
             filterSystemPassed && filterNamePassed
         }
     }
