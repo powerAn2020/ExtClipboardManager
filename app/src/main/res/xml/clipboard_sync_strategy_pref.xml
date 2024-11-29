@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:key="root_key">
+    <PreferenceCategory
+        android:title="@string/sync_manage">
+        <com.hhvvg.ecm.ui.view.ExtSwitchPreference
+            app:icon="@drawable/ic_baseline_clear_all_24"
+            app:key="sync_enable_pull_only"
+            app:title="@string/enable_pull_only"
+            app:summary="@string/enable_pull_only" />
+
+        <com.hhvvg.ecm.ui.view.ExtSwitchPreference
+            app:icon="@drawable/ic_baseline_clock_24"
+            app:key="sync_enable_message_encryption"
+            app:title="@string/enable_message_encryption"
+            app:summary="@string/enable_message_encryption_tip"/>
+
+        <Preference
+            android:icon="@drawable/ic_baseline_five_24"
+            android:key="sync_ws_server"
+            android:title="@string/sync_ws_server_title"
+            android:summary="@string/sync_ws_server_summary"/>
+        <Preference
+            android:icon="@drawable/ic_baseline_five_24"
+            android:key="sync_auth_token"
+            android:title="@string/sync_auth_token_title"
+            android:summary="@string/sync_auth_token_summary"/>
+        <Preference
+            android:icon="@drawable/ic_baseline_five_24"
+            android:key="sync_encryption_key"
+            android:title="@string/sync_encryption_key_title"
+            android:summary="@string/sync_encryption_key_summary"/>
+        <Preference
+            android:icon="@drawable/ic_baseline_five_24"
+            android:key="sync_encryption_iv"
+            android:title="@string/sync_encryption_iv_title"
+            android:summary="@string/sync_encryption_iv_summary"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

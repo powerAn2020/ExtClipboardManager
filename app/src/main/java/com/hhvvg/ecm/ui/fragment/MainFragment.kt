@@ -12,19 +12,17 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ListView
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
 import com.hhvvg.ecm.R
 import com.hhvvg.ecm.configuration.Configuration
 import com.hhvvg.ecm.receiver.ServiceStateReceiver
 import com.hhvvg.ecm.ui.view.ExtSwitchPreference
+import com.hhvvg.ecm.ui.view.InputBottomSheetDialog
 import com.hhvvg.ecm.util.getSystemExtClipboardService
 import com.hhvvg.ecm.util.themeColor
-import com.hhvvg.ecm.ui.view.InputBottomSheetDialog
 import kotlinx.coroutines.launch
 
 /**
@@ -42,6 +40,9 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     private lateinit var writeStrategyPreference: Preference
     private lateinit var readSwitchPreference: Preference
     private lateinit var writeSwitchPreference: Preference
+    private lateinit var syncPreference: Preference
+    private lateinit var syncStrategyPreference: Preference
+
     private val extService by lazy {
         requireContext().getSystemExtClipboardService()
     }
@@ -74,10 +75,25 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
         setPreferencesFromResource(R.xml.main_prefs, rootKey)
         setupEnablePref()
         setupReadStrategyPref()
-        setupWriteStrategyPref()
+//        setupWriteStrategyPref()
         setupAutoClearPref()
         setupAutoClearStrategyPref()
         setupTimeoutClearPref()
+        setupSyncPref()
+    }
+
+    private fun setupSyncPref() {
+        syncPreference = findPreference("sync_clipboard")!!
+        syncPreference.dependency = "enable_management"
+        syncPreference.apply {
+            onPreferenceChangeListener = this@MainFragment
+        }
+        syncStrategyPreference = findPreference("sync_manage_strategy")!!
+        syncStrategyPreference.setOnPreferenceClickListener {
+            val action = MainFragmentDirections.actionMainFragmentToSyncStrategyFragment()
+            navController.navigate(action)
+            true
+        }
     }
 
     private fun setupTimeoutClearPref() {
@@ -149,6 +165,9 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
     private fun setupReadStrategyPref() {
         readSwitchPreference = findPreference("filter_app_read")!!
         readSwitchPreference.dependency = "enable_management"
+        readSwitchPreference.apply {
+            onPreferenceChangeListener = this@MainFragment
+        }
         readStrategyPreference = findPreference("filter_app_read_strategy")!!
         readStrategyPreference.setOnPreferenceClickListener {
             val action = MainFragmentDirections.actionMainFragmentToReadStrategyFragment(Configuration.READ_MODE)
@@ -157,16 +176,16 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
         }
     }
 
-    private fun setupWriteStrategyPref() {
-        writeSwitchPreference = findPreference("filter_app_write")!!
-        writeSwitchPreference.dependency = "enable_management"
-        writeStrategyPreference = findPreference("filter_app_write_strategy")!!
-        writeStrategyPreference.setOnPreferenceClickListener {
-            val action = MainFragmentDirections.actionMainFragmentToWriteStrategyFragment(Configuration.WRITE_MODE)
-            navController.navigate(action)
-            true
-        }
-    }
+//    private fun setupWriteStrategyPref() {
+//        writeSwitchPreference = findPreference("filter_app_write")!!
+//        writeSwitchPreference.dependency = "enable_management"
+//        writeStrategyPreference = findPreference("filter_app_write_strategy")!!
+//        writeStrategyPreference.setOnPreferenceClickListener {
+//            val action = MainFragmentDirections.actionMainFragmentToWriteStrategyFragment(Configuration.WRITE_MODE)
+//            navController.navigate(action)
+//            true
+//        }
+//    }
 
     private fun setupEnablePref() {
         enableSwitchPreference = findPreference("enable_management")!!
@@ -235,6 +254,14 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
             "enable_management" -> {
                 extService?.isEnable = newValue as Boolean
                 ServiceStateReceiver.sendStateChangedBroadcast(requireContext(), newValue, MAIN_EVENT_SOURCE)
+                true
+            }
+            "filter_app_read" -> {
+                extService?.isReadWhiteEnable = newValue as Boolean
+                true
+            }
+            "sync_clipboard" -> {
+                extService?.isSyncEnable = newValue as Boolean
                 true
             }
             else -> {

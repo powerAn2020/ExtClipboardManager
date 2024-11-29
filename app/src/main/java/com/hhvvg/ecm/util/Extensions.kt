@@ -64,7 +64,7 @@ fun String.asClass(loader: ClassLoader? = null): Class<*>? {
     return try {
         Class.forName(this, true, loader) as Class<*>
     } catch (e: Exception) {
-        XposedBridge.log(e)
+        Logger.e(e)
         null
     }
 }
@@ -85,7 +85,7 @@ fun <T> Any.getField(field: String): T? {
     return try {
         XposedHelpers.getObjectField(this, field) as T?
     } catch (e: Exception) {
-        XposedBridge.log(e)
+        Logger.e(e)
         null
     }
 }
@@ -94,7 +94,7 @@ fun <T> Class<*>.getStaticField(field: String): T? {
     return try {
         XposedHelpers.getStaticObjectField(this, field) as T?
     }catch (e: Exception) {
-        XposedBridge.log(e)
+        Logger.e(e)
         null
     }
 }
@@ -123,7 +123,7 @@ fun <T> Any.getExtraField(field: String): T? {
     return try {
         XposedHelpers.getAdditionalInstanceField(this, field) as T?
     } catch (e: Exception) {
-        XposedBridge.log(e)
+        Logger.e(e)
         null
     }
 }

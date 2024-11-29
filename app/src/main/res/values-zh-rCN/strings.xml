@@ -22,7 +22,7 @@
     <string name="auto_clear_summary">在达到特定的情况下会自动清除剪切板</string>
     <string name="filter_app_read_title">过滤应用读</string>
     <string name="filter_app_write_title">过滤应用写</string>
-    <string name="filter_app_read_summary">过滤能够读取剪切板的应用</string>
+    <string name="filter_app_read_summary">过滤能够后台读取剪切板的应用</string>
     <string name="filter_app_write_summary">过滤能够写入剪切板的应用</string>
     <string name="category_filter_summary">过滤管理</string>
     <string name="read_strategy_title">读策略</string>
@@ -62,4 +62,26 @@
     <string name="exclusion_list_label">排除列表</string>
     <string name="filter_apps">过滤应用</string>
     <string name="strategy_title">策略</string>
+    <string name="clipboard_sync">同步剪切板</string>
+    <string name="sync_manage">同步管理</string>
+    <string name="sync_manage_summary">同步剪切板数据到服务器</string>
+    <string name="sync_manage_title">服务器配置</string>
+    <string name="enable_pull_only">仅接收记录</string>
+    <string name="enable_connect_ws_server">开启剪切板同步</string>
+    <string name="wsServerUrlErrorTips">服务器地址无效正确格式为ws(s)://ip:port/xx</string>
+    <string name="IVLengthErrorTips">传输密钥初始向量(IV)长度必须是16位</string>
+    <string name="KeyLengthErrorTips">传输密钥(Key)长度必须是16/24/32</string>
+    <string name="connection_status_runing">服务器已连接</string>
+    <string name="connection_status_stop">服务器未连接</string>
+    <string name="enable_message_encryption_tip">开启后，剪切板内容将加密发送给服务器，其他客户端需要配置key和iv与当前配置一致方可解密</string>
+    <string name="enable_message_encryption">剪切板内容加密传输</string>
+    <string name="sync_ws_server_summary">ws(s)://ip:port/xx</string>
+    <string name="sync_auth_token_summary">服务器访问令牌(AuthToken)</string>
+    <string name="sync_auth_token_title">服务器访问口令</string>
+    <string name="sync_ws_server_title">服务器访问地址</string>
+    <string name="sync_encryption_key_title">数据传输加密密钥</string>
+    <string name="sync_encryption_iv_title">数据传输加密初始向量</string>
+    <string name="sync_encryption_iv_summary">(IV)加密传输需要需要用到，所有客户端必须保持一致，格式：16位数字+字母</string>
+    <string name="sync_encryption_key_summary">(key)加密传输用到，所有客户端必须保持一致，格式：16/24/32位数字+字母</string>
+
 </resources>
