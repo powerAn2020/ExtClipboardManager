@@ -21,7 +21,7 @@
     <string name="auto_clear_summary">Automatically clear your clipboard when reaching some conditions</string>
     <string name="filter_app_read_title">Filter App Read</string>
     <string name="filter_app_write_title">Filter App Write</string>
-    <string name="filter_app_read_summary">Filtering apps for reading from your clipboard</string>
+    <string name="filter_app_read_summary">Filtering apps for reading from your clipboard in the background</string>
     <string name="filter_app_write_summary">Filtering apps for writing to your clipboard</string>
     <string name="category_filter_summary">Filter Management</string>
     <string name="read_strategy_title">Read Strategy</string>
@@ -61,4 +61,25 @@
     <string name="exclusion_list_label">Exclusion List</string>
     <string name="filter_apps">Filter Apps</string>
     <string name="strategy_title">Strategy</string>
+    <string name="clipboard_sync">Synchronous Clipboard</string>
+    <string name="sync_manage">Synchronous Management</string>
+    <string name="sync_manage_summary">Synchronize the clipboard data to the server</string>
+    <string name="sync_manage_title">Server Configuration</string>
+    <string name="enable_connect_ws_server">enable clipboard sync</string>
+    <string name="enable_pull_only">only pull</string>
+    <string name="wsServerUrlErrorTips">ws(s)://xxx/xx</string>
+    <string name="IVLengthErrorTips">(IV) length is 16</string>
+    <string name="KeyLengthErrorTips">(Key)length is 16/24/32</string>
+    <string name="connection_status_runing">server connected</string>
+    <string name="connection_status_stop">server disconnect</string>
+    <string name="enable_message_encryption_tip">开启后，剪切板内容将加密发送给服务器，其他客户端需要配置key和iv与当前配置一致方可解密</string>
+    <string name="enable_message_encryption">Encrypted transmission of the clipboard</string>
+    <string name="sync_ws_server_summary">ws(s)://localhost:8080/chat</string>
+    <string name="sync_auth_token_summary">服务器访问令牌(AuthToken)</string>
+    <string name="sync_auth_token_title">服务器访问口令</string>
+    <string name="sync_ws_server_title">服务器访问地址</string>
+    <string name="sync_encryption_key_title">数据传输加密密钥</string>
+    <string name="sync_encryption_iv_title">数据传输加密初始向量</string>
+    <string name="sync_encryption_iv_summary">(IV)加密传输需要需要用到，所有客户端必须保持一致</string>
+    <string name="sync_encryption_key_summary">(key)加密传输用到，所有客户端必须保持一致，16/24/32位数字+字母</string>
 </resources>

@@ -39,15 +39,28 @@
             android:key="filter_app_read_strategy"
             android:dependency="filter_app_read"
             android:title="@string/read_strategy_title" />
+<!--        <com.hhvvg.ecm.ui.view.ExtSwitchPreference-->
+<!--            app:icon="@drawable/ic_outline_pen_24"-->
+<!--            app:key="filter_app_write"-->
+<!--            app:title="@string/filter_app_write_title"-->
+<!--            app:summary="@string/filter_app_write_summary"/>-->
+<!--        <Preference-->
+<!--            android:key="filter_app_write_strategy"-->
+<!--            android:dependency="filter_app_write"-->
+<!--            android:title="@string/write_strategy_title" />-->
+    </PreferenceCategory >
+
+    <PreferenceCategory
+        android:title="@string/sync_manage">
         <com.hhvvg.ecm.ui.view.ExtSwitchPreference
-            app:icon="@drawable/ic_outline_pen_24"
-            app:key="filter_app_write"
-            app:title="@string/filter_app_write_title"
-            app:summary="@string/filter_app_write_summary"/>
+            app:icon="@drawable/ic_sync_24"
+            app:key="sync_clipboard"
+            android:dependency="enable_management"
+            app:title="@string/clipboard_sync"
+            app:summary="@string/sync_manage_summary"/>
         <Preference
-            android:key="filter_app_write_strategy"
-            android:dependency="filter_app_write"
-            android:title="@string/write_strategy_title" />
+            android:key="sync_manage_strategy"
+            android:title="@string/sync_manage_title" />
     </PreferenceCategory >
 
     <PreferenceCategory

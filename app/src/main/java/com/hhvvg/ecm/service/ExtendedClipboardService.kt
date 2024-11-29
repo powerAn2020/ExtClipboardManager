@@ -9,12 +9,15 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.hhvvg.ecm.BuildConfig
 import com.hhvvg.ecm.ExtFramework.Companion.clipboardImplName
+import com.hhvvg.ecm.ExtFramework.Companion.clipboardServiceName
 import com.hhvvg.ecm.IExtClipboardService
 import com.hhvvg.ecm.configuration.AutoClearStrategyInfo
 import com.hhvvg.ecm.configuration.Configuration
 import com.hhvvg.ecm.configuration.ExtConfigurationStore
+import com.hhvvg.ecm.util.Logger
 import com.hhvvg.ecm.util.asClass
 import com.hhvvg.ecm.util.doAfter
 import com.hhvvg.ecm.util.getField
@@ -72,6 +75,7 @@ class ExtendedClipboardService(
         provideBinderService()
         provideAutoClearService()
         provideClipboardAccessService()
+        provideClipboardSyncService()
     }
 
     private fun provideAutoClearService() {
@@ -149,10 +153,19 @@ class ExtendedClipboardService(
     }
 
     /**
+     * 提供剪切板同步服务
+     */
+    private fun provideClipboardSyncService(){
+
+    }
+    /**
      * hook剪切板权限，允许的包可以在后台读取剪切板
      */
     private fun provideClipboardAccessService() {
-        val clipImplClazz = clipboardImplName.asClass(context.classLoader) ?: return
+        if (!dataStore.appWriteWhiteEnable) {
+            return
+        }
+        val clipImplClazz = clipboardServiceName.asClass(context.classLoader) ?: return
         when (Build.VERSION.SDK_INT) {
             Build.VERSION_CODES.S_V2 -> {
                 clipImplClazz.doAfter("clipboardAccessAllowed",
@@ -164,6 +177,7 @@ class ExtendedClipboardService(
                 ) {
                     //通过调用者UID获取包名，然后匹配白名单
                     if(dataStore.appReadWhitelist.contains(it.args[1])){
+                        Logger.d("package ${it.args[1]} clipboardAccessAllowed")
                         it.result=true
                     }
                 }
@@ -178,6 +192,7 @@ class ExtendedClipboardService(
                     Boolean::class.java // shouldNoteOp
                 ) {
                     if(dataStore.appReadWhitelist.contains(it.args[1])){
+                        Logger.d("package ${it.args[1]} clipboardAccessAllowed")
                         it.result=true
                     }
                 }
@@ -193,6 +208,7 @@ class ExtendedClipboardService(
                     Boolean::class.java // shouldNoteOp
                 ) {
                     if(dataStore.appReadWhitelist.contains(it.args[1])){
+                        Logger.d("package ${it.args[1]} clipboardAccessAllowed")
                         it.result=true
                     }
                 }
@@ -242,7 +258,7 @@ class ExtendedClipboardService(
     }
 
     private fun executeAutoClearIfPossible(clipData: ClipData?, packageName: String, userId: Int) {
-        XposedBridge.log("package $packageName uid $userId get clip, count down: ${currentCountDown.get()}")
+        Logger.d("package $packageName uid $userId get clip, count down: ${currentCountDown.get()}")
         if (!dataStore.enable || !dataStore.autoClearEnable) {
             return
         }
@@ -402,17 +418,128 @@ class ExtendedClipboardService(
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.enable = enable
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
     override fun isEnable(): Boolean = dataStore.enable
+    override fun setSyncEnable(enable: Boolean) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.syncEnable = enable
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun isSyncPullOnlyEnable(): Boolean =dataStore.syncPullOnlyEnable
+
+    override fun setSyncPullOnlyEnable(enable: Boolean) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.syncPullOnlyEnable = enable
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun isSyncEncryptionEnable(): Boolean = dataStore.syncEncryptionEnable;
+
+    override fun setSyncEncryptionEnable(enable: Boolean) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.syncEncryptionEnable = enable
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun getSyncWsServer(): String? {
+        return if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.syncWsServer
+        }else{
+            Logger.w("permission denied")
+            ""
+        }
+    }
+
+    override fun setSyncWsServer(addr: String?) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            if (addr?.isNotBlank() == true)
+            dataStore.syncWsServer = addr?.let { it }?:""
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun getSyncEncryptionKey(): String {
+        return if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.syncEncryptionKey
+        }else{
+            Logger.w("permission denied")
+            ""
+        }
+    }
+
+    override fun setSyncEncryptionKey(key: String?) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            if (key?.isNotBlank() == true)
+            dataStore.syncEncryptionKey = key?.let { it }?:""
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun getSyncEncryptionIV(): String {
+        return if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.syncEncryptionIV
+        }else{
+            Logger.w("permission denied")
+            ""
+        }
+    }
+
+    override fun setSyncEncryptionIV(iv: String?) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            if (iv?.isNotBlank() == true)
+            dataStore.syncEncryptionIV = iv?.let { it }?:""
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun getSyncAuthToken(): String {
+        return if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.syncAuthToken
+        }else{
+            Logger.w("permission denied")
+            ""
+        }
+    }
+
+    override fun setSyncAuthToken(authToken: String?) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            if (authToken?.isNotBlank() == true)
+            dataStore.syncAuthToken = authToken?.let { it }?:""
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun isSyncEnable(): Boolean =dataStore.syncEnable
+
+    override fun setReadWhiteEnable(enable: Boolean) {
+        if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
+            dataStore.appReadWhiteEnable = enable
+        }else{
+            Logger.w("permission denied")
+        }
+    }
+
+    override fun isReadWhiteEnable(): Boolean =dataStore.appReadWhiteEnable
 
     override fun setAutoClearEnable(enable: Boolean) {
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
             dataStore.autoClearEnable = enable
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
@@ -424,7 +551,7 @@ class ExtendedClipboardService(
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)) {
             dataStore.autoClearWorkMode = mode
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
@@ -435,7 +562,7 @@ class ExtendedClipboardService(
             dataStore.autoClearReadCount = count
             resetReadCount()
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
@@ -443,7 +570,7 @@ class ExtendedClipboardService(
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearAppWhitelist = exclusions
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
@@ -451,7 +578,7 @@ class ExtendedClipboardService(
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearAppBlacklist = exclusions
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
@@ -463,7 +590,7 @@ class ExtendedClipboardService(
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.autoClearContentExclusionList = exclusions
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
@@ -478,7 +605,7 @@ class ExtendedClipboardService(
             dataStore.autoClearTimeout = timeout
             rescheduleCurrentAutoClearTimeoutTask()
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
@@ -492,6 +619,7 @@ class ExtendedClipboardService(
         dataStore.addAutoClearStrategy(strategy)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun removeStrategy(packageName: String) {
         dataStore.removeAutoClearStrategy(packageName)
     }
@@ -499,18 +627,16 @@ class ExtendedClipboardService(
     override fun setAppReadWhitelist(exclusions: List<String>) {
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.appReadWhitelist = exclusions
-            rescheduleCurrentAutoClearTimeoutTask()
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 
     override fun setAppWriteWhitelist(exclusions: List<String>) {
         if (checkCallingOrSelfPermission(BuildConfig.PACKAGE_NAME)){
             dataStore.appWriteWhitelist = exclusions
-            rescheduleCurrentAutoClearTimeoutTask()
         }else{
-            XposedBridge.log("permission denied")
+            Logger.w("permission denied")
         }
     }
 

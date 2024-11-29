@@ -20,17 +20,17 @@
                 android:name="selectedStrategy"
                 app:argType="string" />
         </action>
-        <action
-            android:id="@+id/action_mainFragment_to_writeStrategyFragment"
-            app:destination="@id/writeStrategyFragment"
-            app:enterAnim="@anim/anim_open_enter"
-            app:exitAnim="@anim/anim_open_exit"
-            app:popEnterAnim="@anim/anim_close_enter"
-            app:popExitAnim="@anim/anim_close_exit">
-            <argument
-                android:name="selectedStrategy"
-                app:argType="string" />
-        </action>
+<!--        <action-->
+<!--            android:id="@+id/action_mainFragment_to_writeStrategyFragment"-->
+<!--            app:destination="@id/writeStrategyFragment"-->
+<!--            app:enterAnim="@anim/anim_open_enter"-->
+<!--            app:exitAnim="@anim/anim_open_exit"-->
+<!--            app:popEnterAnim="@anim/anim_close_enter"-->
+<!--            app:popExitAnim="@anim/anim_close_exit">-->
+<!--            <argument-->
+<!--                android:name="selectedStrategy"-->
+<!--                app:argType="string" />-->
+<!--        </action>-->
         <action
             android:id="@+id/action_mainFragment_to_autoClearStrategyFragment"
             app:destination="@id/autoClearStrategyFragment"
@@ -38,6 +38,14 @@
             app:exitAnim="@anim/anim_open_exit"
             app:popEnterAnim="@anim/anim_close_enter"
             app:popExitAnim="@anim/anim_close_exit"/>
+        <action
+            android:id="@+id/action_mainFragment_to_syncStrategyFragment"
+            app:destination="@id/syncStrategyFragment"
+            app:enterAnim="@anim/anim_open_enter"
+            app:exitAnim="@anim/anim_open_exit"
+            app:popEnterAnim="@anim/anim_close_enter"
+            app:popExitAnim="@anim/anim_close_exit">
+        </action>
     </fragment>
 
     <fragment
@@ -90,4 +98,12 @@
         android:name="com.hhvvg.ecm.ui.fragment.AutoClearContentExclusionFragment"
         android:label="@string/exclusion_list_label"
         tools:layout="@layout/fragment_auto_clear_content_exclusion"/>
+
+    <fragment
+        android:id="@+id/syncStrategyFragment"
+        android:name="com.hhvvg.ecm.ui.fragment.ClipboardSyncManagementFragment"
+        android:label="@string/read_strategy_title"
+        tools:layout="@layout/ext_text_preference_layout">
+    </fragment>
+
 </navigation>

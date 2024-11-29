@@ -59,6 +59,60 @@ class ExtConfigurationStore {
             configuration.autoClearEnable = value
             workHandler.post(this::saveConfiguration)
         }
+    var syncEnable: Boolean
+        get() = configuration.syncEnable
+        set(value) {
+            configuration.syncEnable = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var syncWsServer:String
+        get() = configuration.syncWsServer
+        set(value) {
+            configuration.syncWsServer = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var syncPullOnlyEnable: Boolean
+        get() = configuration.syncPullOnlyEnable
+        set(value) {
+            configuration.syncPullOnlyEnable = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var syncEncryptionEnable: Boolean
+        get() = configuration.syncEncryptionEnable
+        set(value) {
+            configuration.syncEncryptionEnable = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var syncEncryptionKey: String
+        get() = configuration.syncEncryptionKey
+        set(value) {
+            configuration.syncEncryptionKey = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var syncEncryptionIV: String
+        get() = configuration.syncEncryptionIV
+        set(value) {
+            configuration.syncEncryptionIV = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var syncAuthToken: String
+        get() = configuration.syncAuthToken
+        set(value) {
+            configuration.syncAuthToken = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var appReadWhiteEnable: Boolean
+        get() = configuration.appReadWhiteEnable
+        set(value) {
+            configuration.appReadWhiteEnable = value
+            workHandler.post(this::saveConfiguration)
+        }
+    var appWriteWhiteEnable: Boolean
+        get() = configuration.appWriteWhiteEnable
+        set(value) {
+            configuration.appWriteWhiteEnable = value
+            workHandler.post(this::saveConfiguration)
+        }
     val autoClearStrategy: List<AutoClearStrategyInfo>
         get() = configuration.autoClearStrategies
 
@@ -115,6 +169,7 @@ class ExtConfigurationStore {
             configuration.appWriteWhitelist.addAll(value)
             workHandler.post(this::saveConfiguration)
         }
+
     init {
         configuration = try {
             val json = readFromFile()
