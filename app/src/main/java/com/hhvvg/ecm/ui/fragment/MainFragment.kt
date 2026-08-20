@@ -207,7 +207,7 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
             R.id.share -> {
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "https://github.com/gitofleonardo/ExtClipboardManager")
+                    putExtra(Intent.EXTRA_TEXT, "https://github.com/powerAn2020/ExtClipboardManager")
                     type = "text/plain"
                 }
                 val shareIntent = Intent.createChooser(sendIntent, null)
