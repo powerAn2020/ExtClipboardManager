@@ -74,6 +74,16 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
         setupAutoClearPref()
         setupAutoClearStrategyPref()
         setupTimeoutClearPref()
+        setupClipboardTestPref()
+    }
+
+    private fun setupClipboardTestPref() {
+        val testPreference: Preference = findPreference("clipboard_test_key")!!
+        testPreference.setOnPreferenceClickListener {
+            val action = MainFragmentDirections.actionMainFragmentToClipboardTestFragment()
+            navController.navigate(action)
+            true
+        }
     }
 
     private fun setupTimeoutClearPref() {
@@ -235,3 +245,6 @@ class MainFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeLi
         }
     }
 }
+
+
+

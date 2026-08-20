@@ -42,84 +42,99 @@ class ExtConfigurationStore {
     }
 
     private val gson = Gson()
+    private val lock = Any()
 
     private var configuration: Configuration
 
     var enable: Boolean
-        get() {
-            return configuration.enable
-        }
+        get() = synchronized(lock) { configuration.enable }
         set(value) {
-            configuration.enable = value
+            synchronized(lock) { configuration.enable = value }
             workHandler.post(this::saveConfiguration)
         }
+
     var autoClearEnable: Boolean
-        get() = configuration.autoClearEnable
+        get() = synchronized(lock) { configuration.autoClearEnable }
         set(value) {
-            configuration.autoClearEnable = value
+            synchronized(lock) { configuration.autoClearEnable = value }
             workHandler.post(this::saveConfiguration)
         }
+
     val autoClearStrategy: List<AutoClearStrategyInfo>
-        get() = configuration.autoClearStrategies
+        get() = synchronized(lock) { configuration.autoClearStrategies.toList() }
 
     var autoClearTimeout: Long
-        get() = configuration.autoClearTimeout
+        get() = synchronized(lock) { configuration.autoClearTimeout }
         set(value) {
-            configuration.autoClearTimeout = value
+            synchronized(lock) { configuration.autoClearTimeout = value }
             workHandler.post(this::saveConfiguration)
         }
+
     var autoClearWorkMode: Int
-        get() = configuration.workMode
+        get() = synchronized(lock) { configuration.workMode }
         set(value) {
-            configuration.workMode = value
+            synchronized(lock) { configuration.workMode = value }
             workHandler.post(this::saveConfiguration)
         }
+
     var autoClearReadCount: Int
-        get() = configuration.readCount
+        get() = synchronized(lock) { configuration.readCount }
         set(value) {
-            configuration.readCount = value
+            synchronized(lock) { configuration.readCount = value }
             workHandler.post(this::saveConfiguration)
         }
+
     var autoClearAppBlacklist: List<String>
-        get() = configuration.autoClearAppBlacklist
+        get() = synchronized(lock) { configuration.autoClearAppBlacklist.toList() }
         set(value) {
-            configuration.autoClearAppBlacklist.clear()
-            configuration.autoClearAppBlacklist.addAll(value)
+            synchronized(lock) {
+                configuration.autoClearAppBlacklist.clear()
+                configuration.autoClearAppBlacklist.addAll(value)
+            }
             workHandler.post(this::saveConfiguration)
         }
+
     var autoClearAppWhitelist: List<String>
-        get() = configuration.autoClearAppWhitelist
+        get() = synchronized(lock) { configuration.autoClearAppWhitelist.toList() }
         set(value) {
-            configuration.autoClearAppWhitelist.clear()
-            configuration.autoClearAppWhitelist.addAll(value)
+            synchronized(lock) {
+                configuration.autoClearAppWhitelist.clear()
+                configuration.autoClearAppWhitelist.addAll(value)
+            }
             workHandler.post(this::saveConfiguration)
         }
+
     var autoClearContentExclusionList: List<String>
-        get() = configuration.autoClearContentExclusionList
+        get() = synchronized(lock) { configuration.autoClearContentExclusionList.toList() }
         set(value) {
-            configuration.autoClearContentExclusionList.clear()
-            configuration.autoClearContentExclusionList.addAll(value)
+            synchronized(lock) {
+                configuration.autoClearContentExclusionList.clear()
+                configuration.autoClearContentExclusionList.addAll(value)
+            }
             workHandler.post(this::saveConfiguration)
         }
 
     init {
         configuration = try {
             val json = readFromFile()
-            val gson = Gson()
             gson.fromJson(json, Configuration::class.java)
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             Configuration()
         }
     }
 
     fun addAutoClearStrategy(strategyInfo: AutoClearStrategyInfo) {
-        configuration.autoClearStrategies.add(strategyInfo)
+        synchronized(lock) {
+            configuration.autoClearStrategies.add(strategyInfo)
+        }
         workHandler.post(this::saveConfiguration)
     }
 
     fun removeAutoClearStrategy(packageName: String) {
-        configuration.autoClearStrategies.removeIf {
-            it.packageName == packageName
+        synchronized(lock) {
+            configuration.autoClearStrategies.removeIf {
+                it.packageName == packageName
+            }
         }
         workHandler.post(this::saveConfiguration)
     }
@@ -129,7 +144,7 @@ class ExtConfigurationStore {
     }
 
     private fun saveConfiguration() {
-        synchronized(configuration) {
+        synchronized(lock) {
             dataFile.writeText(gson.toJson(configuration))
         }
     }

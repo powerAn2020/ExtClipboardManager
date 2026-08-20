@@ -2,6 +2,7 @@ package com.hhvvg.ecm.util
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
@@ -152,6 +153,40 @@ fun Context.getSystemExtClipboardService(): IExtClipboardService? {
         ExtendedClipboardService.bundleBinderKey
     ) ?: return null
     return IExtClipboardService.Stub.asInterface(binder)
+}
+
+/**
+ * Get the source package name of the clipboard content (Android 16+)
+ */
+fun ClipboardManager.getPrimaryClipSourceCompat(): String? {
+    return if (Build.VERSION.SDK_INT >= 35) {
+        try {
+            // Try to call getPrimaryClipSource() on Android 16+
+            val method = ClipboardManager::class.java.getMethod("getPrimaryClipSource")
+            method.invoke(this) as? String
+        } catch (e: Throwable) {
+            XposedBridge.log("getPrimaryClipSource not available: ${e.message}")
+            null
+        }
+    } else {
+        null
+    }
+}
+
+/**
+ * Check if clipboard content is sensitive (Android 16+)
+ */
+fun android.content.ClipData.isSensitiveCompat(): Boolean {
+    return if (Build.VERSION.SDK_INT >= 35) {
+        try {
+            val extras = description.extras
+            extras?.getBoolean("android.content.extra.IS_SENSITIVE", false) ?: false
+        } catch (e: Throwable) {
+            false
+        }
+    } else {
+        false
+    }
 }
 
 @ColorInt

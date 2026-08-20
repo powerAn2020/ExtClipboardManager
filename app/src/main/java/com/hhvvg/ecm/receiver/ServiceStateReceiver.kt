@@ -33,7 +33,7 @@ abstract class ServiceStateReceiver : BroadcastReceiver() {
 
         fun registerStateChangedReceiver(context: Context, receiver: BroadcastReceiver) {
             val intentFilter = IntentFilter(ACTION_STATE_CHANGED)
-            context.registerReceiver(receiver, intentFilter)
+            context.registerReceiver(receiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
         }
 
     }

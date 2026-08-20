@@ -25,7 +25,12 @@ class WorkModeListFragment : BaseAppListFragment<WorkListItem>() {
             }
             else -> mutableListOf()
         } ?: mutableListOf()
-        list.toMutableSet()
+        val set = list.toMutableSet()
+        // If whitelist is empty, add "android" as default
+        if (set.isEmpty() && workMode == Configuration.WORK_MODE_WHITELIST) {
+            set.add("android")
+        }
+        set
     }
 
     override fun onCreateAppListAdapter(items: MutableList<WorkListItem>): RecyclerView.Adapter<*> {

@@ -62,4 +62,30 @@
     <string name="exclusion_list_label">排除列表</string>
     <string name="filter_apps">过滤应用</string>
     <string name="strategy_title">策略</string>
+
+    <!-- 剪切板测试 -->
+    <string name="clipboard_test_title">剪切板测试</string>
+    <string name="clipboard_test_summary">验证剪切板 hook 是否正常工作</string>
+    <string name="test_hook_status_title">Hook 状态</string>
+    <string name="test_hook_active">Hook 已激活</string>
+    <string name="test_hook_inactive">Hook 未激活（服务已连接但未启用）</string>
+    <string name="test_hook_not_found">未检测到 Hook</string>
+    <string name="test_hook_unknown">检测中…</string>
+    <string name="test_actions_title">测试操作</string>
+    <string name="test_write_button">写入测试文本到剪切板</string>
+    <string name="test_read_button">读取剪切板</string>
+    <string name="test_reset_button">重置计数器</string>
+    <string name="test_read_info_title">读取信息</string>
+    <string name="test_total_reads_label">触发读取次数：</string>
+    <string name="test_last_package_label">最后读取包名：</string>
+    <string name="test_last_time_label">最后读取时间：</string>
+    <string name="test_none">-</string>
+    <string name="test_write_success">测试文本已写入剪切板</string>
+    <string name="test_read_result">剪切板内容：%s</string>
+    <string name="test_read_empty">剪切板为空</string>
+    <string name="test_reset_success">计数器已重置</string>
+    <string name="test_read_log_title">读取日志</string>
+    <string name="test_read_log_empty">暂无读取记录</string>
 </resources>
+
+

@@ -61,4 +61,30 @@
     <string name="exclusion_list_label">Exclusion List</string>
     <string name="filter_apps">Filter Apps</string>
     <string name="strategy_title">Strategy</string>
+
+    <!-- Clipboard Test -->
+    <string name="clipboard_test_title">Clipboard Test</string>
+    <string name="clipboard_test_summary">Verify that clipboard hook is working</string>
+    <string name="test_hook_status_title">Hook Status</string>
+    <string name="test_hook_active">Hook Active</string>
+    <string name="test_hook_inactive">Hook Inactive (Service connected but disabled)</string>
+    <string name="test_hook_not_found">Hook Not Found</string>
+    <string name="test_hook_unknown">Checking…</string>
+    <string name="test_actions_title">Test Actions</string>
+    <string name="test_write_button">Write Test Text to Clipboard</string>
+    <string name="test_read_button">Read Clipboard</string>
+    <string name="test_reset_button">Reset Counters</string>
+    <string name="test_read_info_title">Read Information</string>
+    <string name="test_total_reads_label">Trigger Reads:</string>
+    <string name="test_last_package_label">Last Read Package:</string>
+    <string name="test_last_time_label">Last Read Time:</string>
+    <string name="test_none">-</string>
+    <string name="test_write_success">Test text written to clipboard</string>
+    <string name="test_read_result">Clipboard: %s</string>
+    <string name="test_read_empty">Clipboard is empty</string>
+    <string name="test_reset_success">Counters reset</string>
+    <string name="test_read_log_title">Read Log</string>
+    <string name="test_read_log_empty">No read records yet</string>
 </resources>
+
+

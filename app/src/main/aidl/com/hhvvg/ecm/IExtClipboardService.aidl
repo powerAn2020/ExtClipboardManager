@@ -2,6 +2,7 @@
 package com.hhvvg.ecm;
 
 import com.hhvvg.ecm.configuration.AutoClearStrategyInfo;
+import com.hhvvg.ecm.model.ClipboardReadInfo;
 
 interface IExtClipboardService {
 
@@ -27,4 +28,11 @@ interface IExtClipboardService {
     List<AutoClearStrategyInfo> getAutoClearStrategies();
     void addAutoClearStrategy(in AutoClearStrategyInfo strategy);
     void removeStrategy(String packageName);
+
+    // Clipboard test methods
+    String getLastReadPackageName();
+    long getLastReadTimestamp();
+    int getTotalReadCount();
+    void resetTestCounters();
+    List<ClipboardReadInfo> getReadLog();
 }

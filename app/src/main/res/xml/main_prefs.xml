@@ -51,6 +51,14 @@
     </PreferenceCategory -->
 
     <PreferenceCategory
+        android:title="@string/clipboard_test_title">
+        <Preference
+            android:key="clipboard_test_key"
+            android:title="@string/clipboard_test_title"
+            android:summary="@string/clipboard_test_summary"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/about_title">
         <Preference
             android:title="@string/source_code"
@@ -68,3 +76,4 @@
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>
+

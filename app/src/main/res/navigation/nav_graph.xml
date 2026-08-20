@@ -30,7 +30,21 @@
             app:exitAnim="@anim/anim_open_exit"
             app:popEnterAnim="@anim/anim_close_enter"
             app:popExitAnim="@anim/anim_close_exit"/>
+    >
+        <action
+            android:id="@+id/action_mainFragment_to_clipboardTestFragment"
+            app:destination="@id/clipboardTestFragment"
+            app:enterAnim="@anim/anim_open_enter"
+            app:exitAnim="@anim/anim_open_exit"
+            app:popEnterAnim="@anim/anim_close_enter"
+            app:popExitAnim="@anim/anim_close_exit"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/clipboardTestFragment"
+        android:name="com.hhvvg.ecm.ui.fragment.ClipboardTestFragment"
+        android:label="@string/clipboard_test_title"
+        tools:layout="@layout/fragment_clipboard_test"/>
 
     <fragment
         android:id="@+id/readStrategyFragment"
@@ -75,3 +89,4 @@
         android:label="@string/exclusion_list_label"
         tools:layout="@layout/fragment_auto_clear_content_exclusion"/>
 </navigation>
+
