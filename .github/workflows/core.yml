@@ -1,126 +1,47 @@
-name: Core
+name: Build
 
 on:
   workflow_dispatch:
   push:
+    branches: [ main, master ]
   pull_request:
+    branches: [ main, master ]
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
-    steps:
+    runs-on: ubuntu-latest
     
-    - name: Checkout source
-      uses: actions/checkout@v2
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
       with:
-        submodules: 'recursive'
-        fetch-depth: 0
-        
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+        submodules: recursive
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
-        
-    - name: Build gradle app:assembleDebug
-      run: |
-        gradle_version="7.3.3"
-        false && gradle_version="$( curl -ks "https://gradle.org/releases/" | sed -r -e '\~v[0-9]|ver~I s~^.*[^0-9.]([0-9.]+[.][0-9])".*$~\1~Igp;d' | head -1; )"
-        url="https://services.gradle.org/distributions/gradle-${gradle_version}-bin.zip"
-        IFS=$'\n'; set -- $( find "${GITHUB_WORKSPACE:-.}" -name gradle-wrapper.properties );
-        for pfile in "$@"; do
-          echo "Updating [$pfile] to gradle version [${gradle_version}] .. " 1>&2
-          sleep 1 || true
-          sed -r -e "\\!(distributionUrl)=.*!{ s!!\\1=${url}!; s!:!\\\\:!g; w /dev/stderr" -e "}" -i.bak -- "$pfile"
-          echo "[ $? ] Updating [$pfile]" 1>&2
-          sleep 1 || true
-        done
-        mkdir -p "$GITHUB_WORKSPACE"
-        
-        export SIGNING_STORE_DIR="$RUNNER_TEMP/keystore"
-        export SIGNING_STORE_FILE="$SIGNING_STORE_DIR/example.com.jks"
-        export SIGNING_STORE_PASSWORD="changeit"
-        mkdir -p "$SIGNING_STORE_DIR"
-        export SIGNING_KEY_ALIAS="example.com"
-        export SIGNING_KEY_DNAME="CN=$SIGNING_KEY_ALIAS, OU=Example Org, O=Example Company, L=San Francisco, ST=California, C=$US"
-        export SIGNING_KEY_PASSWORD="changeit"
-        export ANDROID_NDK_LATEST_HOME="$ANDROID_NDK_HOME"
-        export KEYSTORE="$SIGNING_STORE_FILE"
-        export NDK_DIR="$ANDROID_NDK_HOME"
-        export NDK_ROOT="$ANDROID_NDK_HOME"
-        export NDK_VER="${NDK_ROOT##*/}"
-        CRLF=$'\r\n'
-        
-        keytool -genkeypair -v \
-              -alias       "$SIGNING_KEY_ALIAS" \
-              -dname       "$SIGNING_KEY_DNAME" \
-              -keystore    "$SIGNING_STORE_FILE" \
-              -keypass:env   SIGNING_KEY_PASSWORD \
-              -storepass:env SIGNING_STORE_PASSWORD \
-              -keyalg EC -keysize 256 -validity 385
-              
-        echo "$SIGNING_STORE_PASSWORD$CRLF" \
-          | keytool -keystore "$KEYSTORE" \
-              -keypass:env    SIGNING_KEY_PASSWORD \
-              -storepass:env  SIGNING_STORE_PASSWORD \
-              -importkeystore \
-              -srckeystore  "$SIGNING_STORE_FILE" \
-              -destkeystore "$SIGNING_STORE_FILE" \
-              -deststoretype pkcs12
-        {
-          echo "storeFile=$SIGNING_STORE_FILE";
-          echo "storePassword=$SIGNING_STORE_PASSWORD";
-          echo "keyAlias=$SIGNING_KEY_ALIAS";
-          echo "keyPassword=$SIGNING_KEY_PASSWORD";
-        } | tee keystore.properties \
-          ;
-        {
-          echo -e '\n';
-          echo "android.ndkVersion=$NDK_VER";
-          echo "Pkg.Revision=$NDK_VER";
-          echo "Pkg.Name=android.ndk";
-          echo -e '\n';
-        } | tee -a "$ANDROID_NDK_HOME/source.properties" \
-          | tee -a "$ANDROID_NDK_ROOT/source.properties" \
-          | tee -a "local.properties" \
-          ;
-        {
-          echo -e '\n';
-          echo "android.ndkVersion=$NDK_VER";
-          echo -e '\n';
-        } | tee -a local.properties \
-          ;
-        {
-          echo -e '\n';
-          echo "org.gradle.caching=true";
-          echo "org.gradle.parallel=true";
-          echo "org.gradle.vfs.watch=false";
-          echo -e '\n';
-        } | tee -a gradle.properties
-        
-        ./gradlew app:assembleDebug
-         
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build
+      run: ./gradlew assembleDebug
+
     - name: Upload APK
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: app-debug.apk
-        path: |
-          app/build/outputs/apk/debug/*.apk
-       
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: output
-        path: |
-          ./*
-          ./**
-          build
-          build/*
-          build/**
-          buildRelease
-          buildRelease/*
-          buildRelease/**
-          module
-          module/*
-          module/**
-          $GITHUB_WORKSPACE/**
-          
+        name: app-debug
+        path: app/build/outputs/apk/debug/*.apk
+        retention-days: 7
