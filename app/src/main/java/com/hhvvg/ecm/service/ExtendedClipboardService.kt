@@ -153,9 +153,7 @@ class ExtendedClipboardService(
         val enable = dataStore.enable
         val autoClearEnable = dataStore.autoClearEnable
         
-        if (packageName == BuildConfig.PACKAGE_NAME) {
-            return
-        }
+        
         
         log("onPrimaryClipGet: pkg=$packageName, enable=$enable, autoClear=$autoClearEnable, clipData=${clipData != null}")
         

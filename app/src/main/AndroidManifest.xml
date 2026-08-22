@@ -17,28 +17,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExtClipboardManager">
 
-        <service
-            android:name=".service.ControlTileService"
-            android:enabled="true"
-            android:exported="true"
-            android:icon="@drawable/ic_baseline_edit_24"
-            android:label="@string/tile_control_service_label"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
-                android:value="true" />
-        </service>
-
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Extended ClipboardManager - Android 16 Compatible(Hypoer OS 3)" />
+            android:value="Extended ClipboardManager - Android 16 Compatible(HyperOS 3)" />
         <meta-data
             android:name="xposedminversion"
             android:value="93" />
@@ -52,8 +36,6 @@
             android:theme="@style/Theme.ExtClipboardManager">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -3,7 +3,6 @@
     <string name="app_name">ExtClipboardManager</string>
     <string name="action_settings">设置</string>
     <string name="main_fragment_label">ExtClipboardManager</string>
-    <string name="tile_control_service_label">ExtClipboardManager</string>
     <string name="enabled">启用</string>
     <string name="disabled">禁用</string>
     <string name="current_service_status">服务状态: %s</string>
