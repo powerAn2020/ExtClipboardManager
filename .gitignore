@@ -12,3 +12,5 @@ local.properties
 /decompiled/
 /targetApk/
 /logs/
+*.jks
+*.keystore

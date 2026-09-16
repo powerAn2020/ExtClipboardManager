@@ -19,12 +19,29 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    def keystorePath = System.getenv("KEYSTORE_FILE")
+    def resolvedKeystore = keystorePath ? (rootProject.file(keystorePath).exists() ? rootProject.file(keystorePath) : (file(keystorePath).exists() ? file(keystorePath) : null)) : null
+
+    signingConfigs {
+        if (resolvedKeystore != null) {
+            release {
+                storeFile resolvedKeystore
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField("String", "PACKAGE_NAME", "\"com.hhvvg.ecm\"")
+            if (resolvedKeystore != null) {
+                signingConfig signingConfigs.release
+            }
         }
         debug {
             minifyEnabled false
